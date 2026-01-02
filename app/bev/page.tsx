@@ -135,7 +135,7 @@ export default function BEVPage() {
   setResult(totalCost);
 
   // ----------------------------------------------------
-  // ⭐ SAVE RESULT TO sessionStorage → for Comparison page
+  //  SAVE RESULT TO sessionStorage → for Comparison page
   // ----------------------------------------------------
   if (typeof window !== "undefined") {
     sessionStorage.setItem(

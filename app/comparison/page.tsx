@@ -1,17 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 
-// ---------------- PIE CHART IMPORTS ----------------
-import { Pie } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  ArcElement,
-  Tooltip,
-  Legend
-} from "chart.js";
-
-ChartJS.register(ArcElement, Tooltip, Legend);
+// ✅ Plotly must be dynamically imported in Next.js (no SSR)
+const Plot = dynamic(() => import("react-plotly.js"), { ssr: false });
 
 // ---------------- TYPE ----------------
 interface TCOData {
@@ -21,39 +14,39 @@ interface TCOData {
 // ---------------- COST STRUCTURE ----------------
 const costStructure: Record<string, [string, string][]> = {
   "Operating Costs per km": [
-    ["fuel", "Fuel / Energy"],
-    ["adblue", "AdBlue"],
-    ["tires", "Tires"],
-    ["lubricant", "Lubricant"],
-    ["toll", "Toll"],
+    ["fuel", "Fuel / Energy Cost"],
+    ["adblue", "AdBlue Cost"],
+    ["tires", "Tire Cost"],
+    ["lubricant", "Lubricant Cost"],
+    ["toll", "Toll Fees"],
   ],
   "Fixed Vehicle Costs per Period": [
-    ["leasing", "Leasing"],
+    ["leasing", "Leasing Cost"],
     ["vehicle_tax", "Vehicle Tax"],
     ["insurance", "Insurance"],
-    ["inspection", "Inspection"],
-    ["maintenance", "Maintenance"],
-    ["repairs", "Repairs"],
-    ["small_parts", "Small Parts"],
-    ["cleaning", "Cleaning"],
-    ["garage", "Garage"],
-    ["onboard_system", "Onboard System Maint."],
+    ["inspection", "Inspection / Safety Check"],
+    ["maintenance", "Maintenance Cost"],
+    ["repairs", "Unplanned Repairs"],
+    ["small_parts", "Small Parts & Wear Items"],
+    ["cleaning", "Cleaning Cost"],
+    ["garage", "Garage / Housing Cost"],
+    ["onboard_system", "Onboard System Maintenance"],
   ],
   "One-time Costs (Allocated)": [
-    ["transfer", "Delivery"],
-    ["registration", "Registration"],
-    ["commissioning", "Commissioning"],
-    ["return", "Return Cost"],
+    ["transfer", "Delivery Cost"],
+    ["registration", "Registration Cost"],
+    ["commissioning", "Commissioning Cost"],
+    ["return", "Return / End-of-Lease Cost"],
   ],
   "Personnel Costs": [["driver", "Driver Salary"]],
   "Administrative Costs": [
-    ["admin_partial", "Admin Partial"],
-    ["admin_general", "General Admin"],
+    ["admin_partial", "Administration (Partial)"],
+    ["admin_general", "General Administration"],
   ],
-  "Autonomous Costs": [
-    ["ad_license", "AD License"],
-    ["steward", "Steward"],
-    ["tech_supervision", "Tech Supervision"],
+  "Autonomous Operation Costs": [
+    ["ad_license", "AD License Cost"],
+    ["steward", "Steward Cost"],
+    ["tech_supervision", "Technical Supervision"],
   ],
 };
 
@@ -62,7 +55,6 @@ const getCellColor = (i: number, b: number, a: number) => {
   if (i === b && b === a) return "bg-gray-200"; // all equal
 
   let cls = "";
-
   if (b > i) cls += " bg-blue-100";
   if (a > i) cls += " bg-red-100";
   if (i > b || i > a) cls += " bg-yellow-100";
@@ -70,23 +62,23 @@ const getCellColor = (i: number, b: number, a: number) => {
   return cls;
 };
 
-// ---------------- PIE DATA BUILDER ----------------
-const toPieData = (title: string, data: TCOData) => ({
-  labels: Object.keys(data).filter((k) => k !== "total"),
-  datasets: [
-    {
-      label: title,
-      data: Object.keys(data)
-        .filter((k) => k !== "total")
-        .map((k) => data[k]),
-      backgroundColor: [
-        "#4F81BD", "#C0504D", "#9BBB59", "#8064A2",
-        "#4BACC6", "#F79646", "#92A9CF", "#D99694",
-        "#8DB3E2", "#E6B8B7",
-      ],
-    },
-  ],
-});
+// ---------------- PIE DATA BUILDER (MATCH STREAMLIT prepare_pie) ----------------
+const buildPie = (data: TCOData) => {
+  const labels: string[] = [];
+  const values: number[] = [];
+
+  Object.values(costStructure).forEach((entries) => {
+    entries.forEach(([key, label]) => {
+      const v = data[key] ?? 0;
+      if (key !== "total" && v > 0) {
+        labels.push(label);
+        values.push(v);
+      }
+    });
+  });
+
+  return { labels, values };
+};
 
 // ---------------- MAIN COMPONENT ----------------
 export default function ComparisonPage() {
@@ -143,7 +135,7 @@ export default function ComparisonPage() {
                 {/* Category Row */}
                 <tr>
                   <td colSpan={4} className="bg-gray-200 p-3 text-xl font-bold">
-                    📘 {cat}
+                     {cat}
                   </td>
                 </tr>
 
@@ -168,9 +160,9 @@ export default function ComparisonPage() {
             {/* TOTAL ROW */}
             <tr className="bg-green-100 font-bold">
               <td className="p-3 text-xl">TOTAL Cost per Umlauf</td>
-              <td className="p-3">{ice.total.toFixed(2)} €</td>
-              <td className="p-3">{bev.total.toFixed(2)} €</td>
-              <td className="p-3">{bevAd.total.toFixed(2)} €</td>
+              <td className="p-3">{(ice.total ?? 0).toFixed(2)} €</td>
+              <td className="p-3">{(bev.total ?? 0).toFixed(2)} €</td>
+              <td className="p-3">{(bevAd.total ?? 0).toFixed(2)} €</td>
             </tr>
           </tbody>
         </table>
@@ -183,28 +175,109 @@ export default function ComparisonPage() {
         {/* ICE */}
         <div className="p-6 bg-white rounded-xl shadow-lg">
           <h3 className="text-center text-xl font-bold mb-4">ICE Bus</h3>
-          <Pie data={toPieData("ICE", ice)} />
+          <div className="h-[460px]">
+            <Plot
+              data={[
+                {
+                  type: "pie",
+                  ...buildPie(ice),
+                  textinfo: "percent",
+                  textposition: "auto",
+                  marker: { line: { width: 1, color: "white" } },
+                  hole: 0,
+                } as any,
+              ]}
+              layout={{
+                margin: { l: 10, r: 10, t: 10, b: 10 },
+                showlegend: true,
+                legend: {
+                  x: 1.02,
+                  y: 1,
+                  xanchor: "left",
+                  yanchor: "top",
+                  font: { size: 12 },
+                },
+              }}
+              config={{ responsive: true, displayModeBar: true }}
+              style={{ width: "100%", height: "100%" }}
+              useResizeHandler
+            />
+          </div>
         </div>
 
         {/* BEV */}
         <div className="p-6 bg-white rounded-xl shadow-lg">
           <h3 className="text-center text-xl font-bold mb-4">BEV Bus</h3>
-          <Pie data={toPieData("BEV", bev)} />
+          <div className="h-[460px]">
+            <Plot
+              data={[
+                {
+                  type: "pie",
+                  ...buildPie(bev),
+                  textinfo: "percent",
+                  textposition: "auto",
+                  marker: { line: { width: 1, color: "white" } },
+                  hole: 0,
+                } as any,
+              ]}
+              layout={{
+                margin: { l: 10, r: 10, t: 10, b: 10 },
+                showlegend: true,
+                legend: {
+                  x: 1.02,
+                  y: 1,
+                  xanchor: "left",
+                  yanchor: "top",
+                  font: { size: 12 },
+                },
+              }}
+              config={{ responsive: true, displayModeBar: true }}
+              style={{ width: "100%", height: "100%" }}
+              useResizeHandler
+            />
+          </div>
         </div>
 
         {/* BEV-AD */}
         <div className="p-6 bg-white rounded-xl shadow-lg">
           <h3 className="text-center text-xl font-bold mb-4">BEV-AD Bus</h3>
-          <Pie data={toPieData("BEV-AD", bevAd)} />
+          <div className="h-[460px]">
+            <Plot
+              data={[
+                {
+                  type: "pie",
+                  ...buildPie(bevAd),
+                  textinfo: "percent",
+                  textposition: "auto",
+                  marker: { line: { width: 1, color: "white" } },
+                  hole: 0,
+                } as any,
+              ]}
+              layout={{
+                margin: { l: 10, r: 10, t: 10, b: 10 },
+                showlegend: true,
+                legend: {
+                  x: 1.02,
+                  y: 1,
+                  xanchor: "left",
+                  yanchor: "top",
+                  font: { size: 12 },
+                },
+              }}
+              config={{ responsive: true, displayModeBar: true }}
+              style={{ width: "100%", height: "100%" }}
+              useResizeHandler
+            />
+          </div>
         </div>
       </div>
 
       {/* Legend */}
       <div className="mt-10 p-6 bg-blue-50 border rounded-xl text-lg">
-        ✔ Blue = BEV higher  
-        ✔ Red = BEV-AD higher  
-        ✔ Yellow = ICE higher  
-        ✔ Grey = All equal  
+        ✔ Blue = BEV higher <br />
+        ✔ Red = BEV-AD higher <br />
+        ✔ Yellow = ICE higher <br />
+        ✔ Grey = All equal
       </div>
     </div>
   );
