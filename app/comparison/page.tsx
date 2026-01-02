@@ -123,9 +123,9 @@ export default function ComparisonPage() {
           <thead className="bg-gray-100">
             <tr>
               <th className="p-4 w-1/3 text-left text-lg">Cost Category</th>
-              <th className="p-4 w-1/6 text-left text-lg">ICE</th>
-              <th className="p-4 w-1/6 text-left text-lg">BEV</th>
-              <th className="p-4 w-1/6 text-left text-lg">BEV-AD</th>
+              <th className="p-4 w-1/6 text-left text-lg">Mercedes-Benz Citaro LE C2</th>
+              <th className="p-4 w-1/6 text-left text-lg">MAN Lion’s City E</th>
+              <th className="p-4 w-1/6 text-left text-lg">eVersum eShuttle AD by IAV</th>
             </tr>
           </thead>
 
@@ -174,7 +174,7 @@ export default function ComparisonPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-8">
         {/* ICE */}
         <div className="p-6 bg-white rounded-xl shadow-lg">
-          <h3 className="text-center text-xl font-bold mb-4">ICE Bus</h3>
+          <h3 className="text-center text-xl font-bold mb-4">Mercedes-Benz Citaro LE C2</h3>
           <div className="h-[460px]">
             <Plot
               data={[
@@ -207,7 +207,7 @@ export default function ComparisonPage() {
 
         {/* BEV */}
         <div className="p-6 bg-white rounded-xl shadow-lg">
-          <h3 className="text-center text-xl font-bold mb-4">BEV Bus</h3>
+          <h3 className="text-center text-xl font-bold mb-4">MAN Lion’s City E</h3>
           <div className="h-[460px]">
             <Plot
               data={[
@@ -240,7 +240,7 @@ export default function ComparisonPage() {
 
         {/* BEV-AD */}
         <div className="p-6 bg-white rounded-xl shadow-lg">
-          <h3 className="text-center text-xl font-bold mb-4">BEV-AD Bus</h3>
+          <h3 className="text-center text-xl font-bold mb-4">eVersum eShuttle AD by IAV</h3>
           <div className="h-[460px]">
             <Plot
               data={[
