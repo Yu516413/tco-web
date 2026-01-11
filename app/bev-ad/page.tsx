@@ -211,14 +211,16 @@ export default function BEVADPage() {
       <div
         className="relative h-[340px] w-full"
         style={{
-          backgroundImage: "url('/4.png')",
+          backgroundImage: "url('/4.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
         }}
       >
         <div className="absolute bottom-0 left-0 w-full h-16 bg-gradient-to-b from-transparent to-gray-50"></div>
-
+        <div className="absolute bottom-3 right-6 text-xs text-white/80">
+          Image source: eVersum eShuttle: eVersum Mobility Solutions GmbH
+        </div>
         <div className="absolute z-10 bottom-10 w-full text-center text-white drop-shadow-lg">
           <h1 className="text-5xl font-extrabold">eVersum eShuttle AD</h1>
           <p className="text-xl opacity-90">

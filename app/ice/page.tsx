@@ -168,10 +168,15 @@ export default function ICEPage() {
       {/* HERO BANNER */}
       <div
         className="relative h-[360px] w-full bg-cover bg-center"
-        style={{ backgroundImage: "url('/2.png')" }}
+        style={{ backgroundImage: "url('/2.gif')" }}
       >
+        
         <div className="absolute inset-0 bg-black/40"></div>
-
+        
+        {/* Image Source */}
+        <div className="absolute bottom-3 right-6 text-xs text-white/80">
+          Image source: MB-Citaro: https://daimlerbuses-mbngw.scene7.com/is/image/daimlerbusesmbngw/citaro-stage-efficiency%3A3x1?ts=1764677176986&dpr=off (2026/01/11)
+        </div>
         <div className="relative z-10 max-w-5xl mx-auto pt-36 text-white px-10 drop-shadow-xl">
           <h1 className="text-5xl font-extrabold mb-4 tracking-wide">
             Mercedes-Benz Citaro LE C2

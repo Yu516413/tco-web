@@ -196,12 +196,15 @@ export default function BEVPage() {
       <div
         className="relative h-[360px] w-full bg-center bg-no-repeat"
         style={{
-          backgroundImage: "url('/3.png')"
+          backgroundImage: "url('/3.gif')"
         }}
       >
         {/* dark overlay */}
         <div className="absolute inset-0 bg-black/40"></div>
-
+        {/* Image Source */}
+        <div className="absolute bottom-3 right-6 text-xs text-white/80">
+          Image source: MAN: https://media.man.eu/is/image/MAN/man-bus-sustainable-bus-lions-city-e-le-16x9?crop=240,0,1440,1080&wid=1200&hei=900&fit=stretch&fmt=webp&qlt=60
+        </div>
         <div className="relative z-10 max-w-5xl mx-auto pt-32 text-white px-10 drop-shadow-xl">
 
           <h1 className="text-5xl font-extrabold mb-4 tracking-wide">
